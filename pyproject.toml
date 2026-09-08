@@ -1,17 +1,34 @@
 [project]
 name = "crater-ai"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-authors = [
-    { name = "Nishant-neural", email = "nishantiiwari@gmail.com" }
+description = "Crater.ai — AI Technical Intelligence for Complex Physical Products (Phase 1: Product Knowledge)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "pymupdf>=1.24",        # PDF text + embedded image extraction
+    "pdfplumber>=0.11",     # table extraction
+    "pytesseract>=0.3.10",  # OCR fallback for scanned pages/diagrams
+    "pillow>=10.3",
+    "rank-bm25>=0.2.2",     # keyword/BM25 retrieval
+    "qdrant-client>=1.9",   # vector store
+    "anthropic>=0.34",      # Claude for extraction, reranking, agent loop
+    "sentence-transformers>=3.0",  # local embeddings (swap for hosted embedding API if preferred)
+    "typer>=0.12",          # CLI
+    "python-multipart",     # file uploads in FastAPI
+    "alembic>=1.13",        # DB migrations
 ]
-requires-python = ">=3.14"
-dependencies = []
 
-[project.scripts]
-crater-ai = "crater_ai:main"
+[project.optional-dependencies]
+dev = ["pytest>=8.2", "httpx>=0.27", "pytest-asyncio>=0.23"]
 
 [build-system]
-requires = ["uv_build>=0.12.10,<0.13.0"]
-build-backend = "uv_build"
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend*"]
