@@ -9,11 +9,11 @@ unsourced claim.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from backend.db.models import Document, DocType
+from backend.db.models import Document, DocType, Revision
 from backend.db.session import get_session
 from backend.retrieval.hybrid import hybrid_retrieve
 
@@ -22,17 +22,20 @@ router = APIRouter(prefix="/query", tags=["query"])
 
 class QueryRequest(BaseModel):
     question: str
-    product_id: str | None = None
-    revision_id: str | None = None
+    revision_id: str
     doc_type: DocType | None = None
 
 
 @router.post("")
 def query(payload: QueryRequest, session: Session = Depends(get_session)):
+    revision = session.get(Revision, payload.revision_id)
+    if not revision:
+        raise HTTPException(404, "Revision not found")
+
     results = hybrid_retrieve(
         session=session,
         query=payload.question,
-        product_id=payload.product_id,
+        product_id=revision.product_id,
         revision_id=payload.revision_id,
         doc_type=payload.doc_type.value if payload.doc_type else None,
     )
@@ -48,7 +51,15 @@ def query(payload: QueryRequest, session: Session = Depends(get_session)):
                 "page_number": r.page_number,
                 "source_document": doc.title if doc else None,
                 "doc_type": doc.doc_type.value if doc else None,
+                "revision_id": revision.id,
+                "revision_label": revision.label,
             }
         )
 
-    return {"question": payload.question, "evidence": evidence}
+    return {
+        "question": payload.question,
+        "product_id": revision.product_id,
+        "revision_id": revision.id,
+        "revision_label": revision.label,
+        "evidence": evidence,
+    }
