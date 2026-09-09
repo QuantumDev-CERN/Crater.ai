@@ -123,4 +123,6 @@ def persist_extraction(
             )
         )
 
-    session.commit()
+    # The pipeline commits the complete extraction in one transaction. This
+    # prevents retries from accumulating a partially extracted Product Brain.
+    session.flush()

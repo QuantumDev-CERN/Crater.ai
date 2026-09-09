@@ -14,6 +14,7 @@ arbitrary number of ranked lists.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 
 from sqlalchemy.orm import Session
 
@@ -22,6 +23,8 @@ from backend.db.models import Chunk
 from backend.retrieval.bm25 import bm25_search
 from backend.retrieval.reranker import rerank
 from backend.retrieval.vector_store import semantic_search
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -51,7 +54,13 @@ def hybrid_retrieve(
 ) -> list[RetrievedChunk]:
     top_k = settings.hybrid_top_k
 
-    semantic_hits = semantic_search(query, top_k, product_id, revision_id, doc_type)
+    try:
+        semantic_hits = semantic_search(query, top_k, product_id, revision_id, doc_type)
+    except Exception as exc:
+        # Keyword retrieval remains useful for exact part numbers, terminals,
+        # and error codes when Qdrant or the embedding provider is unavailable.
+        logger.warning("Semantic retrieval unavailable; using BM25 only: %s", exc)
+        semantic_hits = []
     keyword_hits = bm25_search(session, query, top_k, product_id, revision_id, doc_type)
 
     fused_ids = _reciprocal_rank_fusion(
