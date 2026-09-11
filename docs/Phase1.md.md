@@ -69,8 +69,13 @@ python scripts/ingest_docs.py path/to/manual.pdf \
 Then:
 ```bash
 curl -X POST localhost:8000/query -H "Content-Type: application/json" \
-  -d '{"question": "How do I check the drive enable signal?", "product_id": "..."}'
+  -d '{"question": "How do I check the drive enable signal?", "revision_id": "..."}'
 ```
+
+The API requires a revision for every technician-facing query and returns that
+revision with each evidence item. PDF uploads require an `idempotency_key` form
+field; use `GET /ingest/jobs/{job_id}` to inspect the status and
+`POST /ingest/jobs/{job_id}/retry` to resume a failed ingestion.
 
 ## Tests
 
