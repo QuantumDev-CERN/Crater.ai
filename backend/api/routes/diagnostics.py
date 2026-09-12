@@ -9,10 +9,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session as DBSession
 
-from crater.db.models import DiagnosticSession, Product, Revision
-from crater.db.session import get_session
-from crater.diagnostics.agent import run_turn, start_session
-from crater.diagnostics.schema import DiagnosticSessionView, DiagnosticState
+from backend.db.models import DiagnosticSession, Product, Revision
+from backend.db.session import get_session
+from backend.diagnostics.agent import run_turn, start_session
+from backend.diagnostics.schema import DiagnosticSessionView, DiagnosticState
 
 router = APIRouter(prefix="/diagnose", tags=["diagnostics"])
 

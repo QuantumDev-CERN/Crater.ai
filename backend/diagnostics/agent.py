@@ -19,11 +19,11 @@ import json
 from anthropic import Anthropic
 from sqlalchemy.orm import Session as DBSession
 
-from crater.config import settings
-from crater.db.models import Component, DiagnosticSession, DiagnosticStatus, FailureMode
-from crater.diagnostics.prompts import DIAGNOSTIC_SYSTEM_PROMPT
-from crater.diagnostics.schema import DiagnosticState, EvidenceRef, Hypothesis, NextStep, NextStepType
-from crater.retrieval.hybrid import hybrid_retrieve
+from backend.config import settings
+from backend.db.models import Component, DiagnosticSession, DiagnosticStatus, FailureMode
+from backend.diagnostics.prompts import DIAGNOSTIC_SYSTEM_PROMPT
+from backend.diagnostics.schema import DiagnosticState, EvidenceRef, Hypothesis, NextStep, NextStepType
+from backend.retrieval.hybrid import hybrid_retrieve
 
 _MAX_TURNS_BEFORE_FORCED_ESCALATION = 8
 _LOW_CONFIDENCE_ESCALATION_THRESHOLD = 0.35
